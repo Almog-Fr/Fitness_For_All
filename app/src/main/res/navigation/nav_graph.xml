@@ -47,7 +47,11 @@
         android:id="@+id/homeWorkoutGear"
         android:name="com.example.final_project.HomeWorkoutGear"
         android:label="fragment_home_workout_gear"
-        tools:layout="@layout/fragment_home_workout_gear" />
+        tools:layout="@layout/fragment_home_workout_gear" >
+        <action
+            android:id="@+id/action_homeWorkoutGear_to_startHomeWorkout"
+            app:destination="@id/startHomeWorkout" />
+    </fragment>
     <fragment
         android:id="@+id/findGymNearMe"
         android:name="com.example.final_project.FindGymNearMe"
@@ -74,4 +78,13 @@
         android:name="com.example.final_project.FutureWorkout"
         android:label="fragment_future_workout"
         tools:layout="@layout/fragment_future_workout" />
+    <fragment
+        android:id="@+id/startHomeWorkout"
+        android:name="com.example.final_project.StartHomeWorkout"
+        android:label="fragment_start_home_workout"
+        tools:layout="@layout/fragment_start_home_workout" >
+        <action
+            android:id="@+id/action_startHomeWorkout_to_postLoginPage"
+            app:destination="@id/postLoginPage" />
+    </fragment>
 </navigation>

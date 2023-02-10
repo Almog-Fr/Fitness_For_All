@@ -2,6 +2,7 @@ package com.example.final_project;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -10,6 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.lang.annotation.Native;
 
@@ -28,6 +35,7 @@ public class LoginPage extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public LoginPage() {
         // Required empty public constructor
@@ -87,8 +95,23 @@ public class LoginPage extends Fragment {
             public void onClick(View view) {
                 String email = loginPageEmailText.getText().toString();
                 String password = passwordText.getText().toString();
-                MainActivity mainActivity = new MainActivity();
-                mainActivity.loginFunc(view,email,password);
+                //MainActivity mainActivity = new MainActivity();
+                //mainActivity.loginFunc(view,email,password);
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(view.getContext(),"Login completed successfully",Toast.LENGTH_LONG).show();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("email",email);
+                                    Navigation.findNavController(view).navigate(R.id.action_loginPage_to_postLoginPage,bundle);
+
+                                } else {
+                                    Toast.makeText(view.getContext(),"Login failed, please try again",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
             }
         });
 

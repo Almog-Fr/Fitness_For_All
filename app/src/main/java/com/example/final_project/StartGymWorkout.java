@@ -67,12 +67,9 @@ public class StartGymWorkout extends Fragment {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("firstName", getArguments().getString("firstName"));
-                bundle.putString("lastName", getArguments().getString("lastName"));
-                bundle.putInt("age",getArguments().getInt("age"));
                 bundle.putString("email", getArguments().getString("email"));
-                bundle.putInt("level", getArguments().getInt("level"));
-                bundle.putInt("xp", getArguments().getInt("xp"));
+                Trainee trainee = new Trainee();
+                trainee.addXp(getArguments().getString("email"),10);
                 Navigation.findNavController(view).navigate(R.id.action_startGymWorkout_to_postLoginPage,bundle);
             }
         });

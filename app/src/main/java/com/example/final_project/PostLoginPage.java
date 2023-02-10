@@ -2,6 +2,7 @@ package com.example.final_project;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -11,6 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
@@ -29,6 +36,8 @@ public class PostLoginPage extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private DatabaseReference databaseReference;
+    Trainee trainee;
 
     public PostLoginPage() {
         // Required empty public constructor
@@ -79,19 +88,41 @@ public class PostLoginPage extends Fragment {
         TextView currLevelText = view.findViewById(R.id.curr_level);
         TextView currExpText = view.findViewById(R.id.curr_xp);
         TextView xpTpNextLevelText = view.findViewById(R.id.xp_left_to_next_level);
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.child(getArguments().getString("email").replace(".",",")).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Trainee trainee = snapshot.getValue(Trainee.class);
+                textView.setText("Hello " + trainee.getFirstName() + "!");
+                currLevelText.setText("Current level: " + trainee.getLevel());
+                currExpText.setText("experience gained this far: " + trainee.getExperience());
+                boolean permission = canDoChallenge(trainee.getExperience(),trainee.getLevel() * 50);
 
+                if (permission){
+                    xpTpNextLevelText.setText("You can do a challenge and level up!");
+                }
+                else{
+                    xpTpNextLevelText.setText("You need extra training in order to face the challenge.");
+                }
 
-        textView.setText("Hello " + getArguments().getString("firstName") + "!");
-        currLevelText.setText("Current level: " + getArguments().getInt("level"));
-        currExpText.setText("experience gained this far: " + getArguments().getInt("xp"));
-        boolean permission = canDoChallenge(getArguments().getInt("xp"),getArguments().getInt("level") * 50);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //textView.setText("Hello " + getArguments().getString("firstName") + "!");
+        //currLevelText.setText("Current level: " + getArguments().getInt("level"));
+        //currExpText.setText("experience gained this far: " + getArguments().getInt("xp"));
+        /*boolean permission = canDoChallenge(getArguments().getInt("xp"),getArguments().getInt("level") * 50);
 
         if (permission){
             xpTpNextLevelText.setText("You can do a challenge and level up!");
         }
         else{
             xpTpNextLevelText.setText("You need extra training in order to face the challenge.");
-        }
+        }*/
 
         Button homeWorkoutButton = view.findViewById(R.id.home_workout);
         Button gymWorkoutButton = view.findViewById(R.id.gym_workout);
@@ -109,34 +140,57 @@ public class PostLoginPage extends Fragment {
         gymWorkoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(xpTpNextLevelText.getText().toString() == "You can do a challenge and level up!"){
+                    Toast.makeText(getContext(),"You are ready to complete a challenge! you need to complete a challenge to unlock more workouts.",Toast.LENGTH_LONG).show();
+                }else{
                 Bundle bundle = new Bundle();
-                bundle.putString("firstName", getArguments().getString("firstName"));
-                bundle.putString("lastName", getArguments().getString("lastName"));
-                bundle.putInt("age",getArguments().getInt("age"));
                 bundle.putString("email", getArguments().getString("email"));
-                bundle.putInt("level", getArguments().getInt("level"));
-                bundle.putInt("xp", getArguments().getInt("xp"));
-                Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_findGymNearMe,bundle);
+                Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_findGymNearMe,bundle);}
+
             }
         });
 
         homeWorkoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_homeWorkoutGear);
+
+                if(xpTpNextLevelText.getText().toString() == "You can do a challenge and level up!"){
+
+                    Toast.makeText(getContext(),"You are ready to complete a challenge! you need to complete a challenge to unlock more workouts.",Toast.LENGTH_LONG).show();
+
+                }else {
+                Bundle bundle = new Bundle();
+                String level = currLevelText.getText().toString().replace("Current level: ","");
+                bundle.putString("level",level);
+                bundle.putString("email", getArguments().getString("email"));
+                Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_homeWorkoutGear,bundle);}
             }
         });
 
         challengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(permission){
+                databaseReference.child(getArguments().getString("email").replace(".",",")).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Trainee trainee = snapshot.getValue(Trainee.class);
+                        boolean permission = canDoChallenge(trainee.getExperience(), trainee.getLevel() * 50);
 
-                }
+                        if (permission){
 
-                else{
-                    Toast.makeText(v.getContext(),"Not enough xp for a challenge, work out some more to unlock",Toast.LENGTH_LONG).show();
-                }
+                        }
+                        else{
+                            Toast.makeText(getContext(),"You need extra training in order to face the challenge.",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 

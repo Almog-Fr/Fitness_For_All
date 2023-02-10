@@ -74,7 +74,7 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
     private String mParam1;
     private String mParam2;
     private boolean isPermissionsGranted;
-    private String provider;
+    private List<String> providers;
     MapView mapView;
     FusedLocationProviderClient fusedLocationProviderClient;
     LatLng latLng;
@@ -128,7 +128,7 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
         getLastLocation();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria,false);
+        providers = locationManager.getProviders(criteria,false);
         getMyLocation();
         mapView.getMapAsync(this);
         mapView.onCreate(savedInstanceState);
@@ -144,12 +144,7 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("firstName", getArguments().getString("firstName"));
-                bundle.putString("lastName", getArguments().getString("lastName"));
-                bundle.putInt("age",getArguments().getInt("age"));
                 bundle.putString("email", getArguments().getString("email"));
-                bundle.putInt("level", getArguments().getInt("level"));
-                bundle.putInt("xp", getArguments().getInt("xp"));
                 Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_startGymWorkout,bundle);
             }
         });
@@ -159,12 +154,18 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
     }
 
     private void getMyLocation() {
-        if(provider != null){
+        if(providers.isEmpty() != true){
             if(ActivityCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             }
             else{
+                for(String provider: providers){
                 myLocation = locationManager.getLastKnownLocation(provider);
+                if(locationManager == null){
+                    continue;
+                }
+
+                }
             }
     }
 
