@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.Navigation;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity{
                 bundle.putString("email", value.getEmail());
                 bundle.putInt("level", value.getLevel());
                 bundle.putInt("xp", value.getExperience());
-                Navigation.findNavController(view).navigate(R.id.action_loginPage_to_postLoginPage,bundle);
+                //Navigation.findNavController(view).navigate(R.id.action_loginPage_to_postLoginPage,bundle);
             }
 
             @Override
@@ -115,6 +117,8 @@ public class MainActivity extends AppCompatActivity{
         myRef.setValue(trainee);
 
     }
+
+
 
 
 }

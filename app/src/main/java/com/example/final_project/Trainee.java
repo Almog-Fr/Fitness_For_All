@@ -1,5 +1,20 @@
 package com.example.final_project;
 
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class Trainee {
@@ -11,6 +26,7 @@ public class Trainee {
     private String password;
     private int level;
     private int experience;
+    private DatabaseReference databaseReference;
 
     public Trainee(String firstName, String lastName, int age, String email, String password) {
         this.firstName = firstName;
@@ -85,5 +101,43 @@ public class Trainee {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public void addXp(String email, int amount){
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+
+       databaseReference.child(email.replace('.',',')).addListenerForSingleValueEvent(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot snapshot) {
+               Trainee trainee = snapshot.getValue(Trainee.class);
+               databaseReference.child(email.replace('.',',')).child("experience").setValue(trainee.getExperience() + amount);
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError error) {
+
+           }
+       });
+
+
+
+
+    }
+
+    public void addLevel(String email){
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+
+        databaseReference.child(email.replace('.',',')).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Trainee trainee = snapshot.getValue(Trainee.class);
+                databaseReference.child(email.replace('.',',')).child("experience").setValue(trainee.getLevel() + 1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

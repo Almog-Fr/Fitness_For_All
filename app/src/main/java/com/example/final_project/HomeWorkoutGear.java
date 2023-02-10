@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,8 +82,14 @@ public class HomeWorkoutGear extends Fragment {
                             Item currItem = ((MyAdapter) recyclerView.getAdapter()).getItem(i);
                             descArray.add(currItem.getDescription());
 
+
                     }
                 }
+                Bundle bundle = new Bundle();
+                bundle.putString("level",getArguments().getString("level"));
+                bundle.putStringArrayList("gear",descArray);
+                bundle.putString("email", getArguments().getString("email"));
+                Navigation.findNavController(view).navigate(R.id.action_homeWorkoutGear_to_startHomeWorkout,bundle);
             }
         });
 
