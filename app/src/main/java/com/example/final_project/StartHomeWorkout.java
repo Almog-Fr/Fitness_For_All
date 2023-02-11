@@ -227,6 +227,8 @@ public class StartHomeWorkout extends Fragment {
         homeWorkoutFinishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Workout workout = new Workout("Home workout",System.currentTimeMillis());
+                workout.addWorkout(getArguments().getString("email"));
                 Bundle bundle = new Bundle();
                 bundle.putString("email", getArguments().getString("email"));
                 Trainee trainee = new Trainee();

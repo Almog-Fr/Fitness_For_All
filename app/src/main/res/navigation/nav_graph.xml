@@ -45,6 +45,9 @@
         <action
             android:id="@+id/action_postLoginPage_to_challengeFragment"
             app:destination="@id/challengeFragment" />
+        <action
+            android:id="@+id/action_postLoginPage_to_userDashboard"
+            app:destination="@id/userDashboard" />
     </fragment>
     <fragment
         android:id="@+id/homeWorkoutGear"
@@ -97,6 +100,15 @@
         tools:layout="@layout/fragment_challenge" >
         <action
             android:id="@+id/action_challengeFragment_to_postLoginPage"
+            app:destination="@id/postLoginPage" />
+    </fragment>
+    <fragment
+        android:id="@+id/userDashboard"
+        android:name="com.example.final_project.UserDashboard"
+        android:label="fragment_user_dashboard"
+        tools:layout="@layout/fragment_user_dashboard" >
+        <action
+            android:id="@+id/action_userDashboard_to_postLoginPage"
             app:destination="@id/postLoginPage" />
     </fragment>
 </navigation>

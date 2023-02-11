@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link StartGymWorkout#newInstance} factory method to
@@ -25,6 +28,7 @@ public class StartGymWorkout extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    DatabaseReference databaseReference;
 
     public StartGymWorkout() {
         // Required empty public constructor
@@ -66,6 +70,9 @@ public class StartGymWorkout extends Fragment {
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                databaseReference = FirebaseDatabase.getInstance().getReference("tracking");
+                Workout workout = new Workout("Gym workout",System.currentTimeMillis());
+                workout.addWorkout(getArguments().getString("email"));
                 Bundle bundle = new Bundle();
                 bundle.putString("email", getArguments().getString("email"));
                 Trainee trainee = new Trainee();

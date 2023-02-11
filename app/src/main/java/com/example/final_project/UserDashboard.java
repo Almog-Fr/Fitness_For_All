@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,10 +26,10 @@ import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ChallengeFragment#newInstance} factory method to
+ * Use the {@link UserDashboard#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChallengeFragment extends Fragment {
+public class UserDashboard extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,10 +41,10 @@ public class ChallengeFragment extends Fragment {
     private String mParam2;
     RecyclerView recyclerView;
     DatabaseReference databaseReference;
-    DrillAdapter drillAdapter;
-    ArrayList<Drill> list;
+    WorkoutAdapter workoutAdapter;
+    ArrayList<Workout> list;
 
-    public ChallengeFragment() {
+    public UserDashboard() {
         // Required empty public constructor
     }
 
@@ -51,11 +54,11 @@ public class ChallengeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ChallengeFragment.
+     * @return A new instance of fragment UserDashboard.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChallengeFragment newInstance(String param1, String param2) {
-        ChallengeFragment fragment = new ChallengeFragment();
+    public static UserDashboard newInstance(String param1, String param2) {
+        UserDashboard fragment = new UserDashboard();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -75,60 +78,75 @@ public class ChallengeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-       View view = inflater.inflate(R.layout.fragment_challenge, container, false);
-        Button homeWorkoutFinishButton = view.findViewById(R.id.challenge_finish_button);
-        String level = getArguments().getString("level");
-        String literalLevel = "";
-        switch (level){
-            case "1": literalLevel = "challenge1";
-                break;
-            case "2": literalLevel = "challenge2";
-                break;
-            case "3": literalLevel = "challenge3";
-                break;
-            case "4": literalLevel = "challenge4";
-                break;
-        }
-        recyclerView = view.findViewById(R.id.challenge_rec_view);
-        databaseReference = FirebaseDatabase.getInstance().getReference("challenges").child(literalLevel);
+        View view = inflater.inflate(R.layout.fragment_user_dashboard, container, false);
+        EditText lastWeight = view.findViewById(R.id.lastWeekWeight);
+        EditText currentWeight = view.findViewById(R.id.current_weight);
+        Button submit = view.findViewById(R.id.dashboard_submit);
+        Button back = view.findViewById(R.id.dashboard_back_button);
+        recyclerView = view.findViewById(R.id.past_week_workouts);
+        databaseReference = FirebaseDatabase.getInstance().getReference("tracking").child(getArguments().getString("email").replace(".",","));
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         list = new ArrayList<>();
-        drillAdapter = new DrillAdapter(getContext(),list);
-        recyclerView.setAdapter(drillAdapter);
+        workoutAdapter = new WorkoutAdapter(getContext(),list);
+        recyclerView.setAdapter(workoutAdapter);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                    Drill drill = dataSnapshot.getValue(Drill.class);
-                    list.add(drill);
+                    Workout workout = dataSnapshot.getValue(Workout.class);
+                    if(System.currentTimeMillis() - 604800000 <= workout.getTimeStamp()){
+                        list.add(workout);
+                    }
+                    else{
+                        continue;
+                    }
 
                 }
-
-                drillAdapter.notifyDataSetChanged();
+                workoutAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+
         });
 
-        homeWorkoutFinishButton.setOnClickListener(new View.OnClickListener() {
+        submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Workout workout = new Workout("Challenge",System.currentTimeMillis());
-                workout.addWorkout(getArguments().getString("email"));
+                String lastWeek = lastWeight.getText().toString();
+                String currWeek = currentWeight.getText().toString();
+                try {
+                    int lastWeekEight = Integer.parseInt(lastWeek);
+                    int currentWeek = Integer.parseInt(currWeek);
+                    if(lastWeekEight > currentWeek){
+                        Toast.makeText(getContext(),"Well done! nice weight loss!",Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(getContext(),"Some more workout is needed :)",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+                catch (Exception e){
+                    Toast.makeText(getContext(),"The weight entered is not a number",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString("email", getArguments().getString("email"));
-                Trainee trainee = new Trainee();
-                trainee.addLevel(getArguments().getString("email"));
-                Navigation.findNavController(view).navigate(R.id.action_challengeFragment_to_postLoginPage,bundle);
+                bundle.putString("email",getArguments().getString("email"));
+                Navigation.findNavController(view).navigate(R.id.action_userDashboard_to_postLoginPage,bundle);
             }
         });
 
 
-       return view;
+
+
+        return view;
     }
 }

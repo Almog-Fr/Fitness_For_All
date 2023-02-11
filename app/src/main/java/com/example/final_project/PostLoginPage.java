@@ -129,6 +129,7 @@ public class PostLoginPage extends Fragment {
         Button challengeButton = view.findViewById(R.id.challenge_button);
         Button reButton = view.findViewById(R.id.return_to_home_page);
         Button futureWorkout = view.findViewById(R.id.future_workout);
+        Button userDashboard = view.findViewById(R.id.user_dashboard);
 
         futureWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +206,17 @@ public class PostLoginPage extends Fragment {
                 Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_loginPage);
             }
         });
+
+        userDashboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString("email", getArguments().getString("email"));
+                Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_userDashboard,bundle);
+            }
+        });
+
+
 
         return view;
     }

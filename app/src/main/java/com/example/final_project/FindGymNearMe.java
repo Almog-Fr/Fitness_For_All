@@ -137,7 +137,9 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
         goBackButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_postLoginPage);
+                Bundle bundle = new Bundle();
+                bundle.putString("email", getArguments().getString("email"));
+                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_postLoginPage,bundle);
             }
         });
         nextButt.setOnClickListener(new View.OnClickListener() {
