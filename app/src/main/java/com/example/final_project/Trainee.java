@@ -131,7 +131,8 @@ public class Trainee {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Trainee trainee = snapshot.getValue(Trainee.class);
-                databaseReference.child(email.replace('.',',')).child("experience").setValue(trainee.getLevel() + 1);
+                databaseReference.child(email.replace('.',',')).child("level").setValue(trainee.getLevel() + 1);
+                databaseReference.child(email.replace('.',',')).child("experience").setValue(0);
             }
 
             @Override

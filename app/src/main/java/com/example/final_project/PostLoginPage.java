@@ -178,6 +178,11 @@ public class PostLoginPage extends Fragment {
                         boolean permission = canDoChallenge(trainee.getExperience(), trainee.getLevel() * 50);
 
                         if (permission){
+                            Bundle bundle = new Bundle();
+                            String level = currLevelText.getText().toString().replace("Current level: ","");
+                            bundle.putString("level",level);
+                            bundle.putString("email", getArguments().getString("email"));
+                            Navigation.findNavController(view).navigate(R.id.action_postLoginPage_to_challengeFragment,bundle);
 
                         }
                         else{

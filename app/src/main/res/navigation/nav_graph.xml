@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_postLoginPage_to_futureWorkout"
             app:destination="@id/futureWorkout" />
+        <action
+            android:id="@+id/action_postLoginPage_to_challengeFragment"
+            app:destination="@id/challengeFragment" />
     </fragment>
     <fragment
         android:id="@+id/homeWorkoutGear"
@@ -85,6 +88,15 @@
         tools:layout="@layout/fragment_start_home_workout" >
         <action
             android:id="@+id/action_startHomeWorkout_to_postLoginPage"
+            app:destination="@id/postLoginPage" />
+    </fragment>
+    <fragment
+        android:id="@+id/challengeFragment"
+        android:name="com.example.final_project.ChallengeFragment"
+        android:label="fragment_challenge"
+        tools:layout="@layout/fragment_challenge" >
+        <action
+            android:id="@+id/action_challengeFragment_to_postLoginPage"
             app:destination="@id/postLoginPage" />
     </fragment>
 </navigation>
