@@ -154,7 +154,7 @@ public class StartHomeWorkout extends Fragment {
                 additionalDrills.remove(randomIndex);
             }
         }
-        else if(additionalDrills.size()<3 && additionalDrills.size() > 0){
+        else if(additionalDrills.size()<=3 && additionalDrills.size() > 0){
 
             for(int i = 0; i < additionalDrills.size();i++){
                 String currItem = additionalDrills.get(i);

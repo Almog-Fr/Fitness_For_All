@@ -1,7 +1,6 @@
 package com.example.final_project;
 
 
-
 import static androidx.browser.customtabs.CustomTabsClient.getPackageName;
 
 
@@ -16,6 +15,8 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -83,9 +84,6 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
     LocationManager locationManager;
 
 
-
-
-
     public FindGymNearMe() {
         // Required empty public constructor
     }
@@ -123,12 +121,11 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_find_gym_near_me, container, false);
         mapView = view.findViewById(R.id.my_map);
-        checkPermissions();
+        //checkPermissions();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-        getLastLocation();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        providers = locationManager.getProviders(criteria,false);
+        providers = locationManager.getProviders(criteria, false);
         getMyLocation();
         mapView.getMapAsync(this);
         mapView.onCreate(savedInstanceState);
@@ -139,7 +136,7 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("email", getArguments().getString("email"));
-                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_postLoginPage,bundle);
+                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_postLoginPage, bundle);
             }
         });
         nextButt.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +144,7 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("email", getArguments().getString("email"));
-                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_startGymWorkout,bundle);
+                Navigation.findNavController(view).navigate(R.id.action_findGymNearMe_to_startGymWorkout, bundle);
             }
         });
 
@@ -156,78 +153,54 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
     }
 
     private void getMyLocation() {
-        if(providers.isEmpty() != true){
-            if(ActivityCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-            }
-            else{
-                for(String provider: providers){
-                myLocation = locationManager.getLastKnownLocation(provider);
-                if(locationManager == null){
-                    continue;
-                }
+        if (providers.isEmpty() != true) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityResultLauncher<String[]> locationPermissionRequest =
+                        registerForActivityResult(new ActivityResultContracts
+                                        .RequestMultiplePermissions(), result -> {
+                                    Boolean fineLocationGranted = null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                        fineLocationGranted = result.getOrDefault(
+                                                Manifest.permission.ACCESS_FINE_LOCATION, false);
+                                    }
+                                    Boolean coarseLocationGranted = null;
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                        coarseLocationGranted = result.getOrDefault(
+                                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                                    }
+                                    if (fineLocationGranted != null && fineLocationGranted) {
+                                        // Precise location access granted.
+                                    } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                                        // Only approximate location access granted.
+                                    } else {
+                                        // No location access granted.
+                                    }
+                                }
+                        );
 
-                }
-            }
-    }
-
-    }
-
-
-    private void getLastLocation() {
-        if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if(location != null){
-                        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-                        List<Address> addresses = null;
-                        myLocation = location;
-                        try {
-                            addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        latLng = new LatLng(addresses.get(0).getLatitude(),addresses.get(0).getLongitude());
+                locationPermissionRequest.launch(new String[] {
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                });
+            } else {
+                for (String provider : providers) {
+                    myLocation = locationManager.getLastKnownLocation(provider);
+                    if (locationManager == null) {
+                        continue;
                     }
+
                 }
-            });
-
-
-        }else{
-            Toast.makeText(getContext(),"Location permissions not granted",Toast.LENGTH_LONG).show();
-
+            }
         }
+        if (myLocation == null) {
+            //getLastLocation();
+        }
+
     }
-
-
-
-
-    private void checkPermissions() {
-        Dexter.withContext(getContext()).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                isPermissionsGranted = true;
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-
-
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                permissionToken.continuePermissionRequest();
-            }
-        }).check();
-    }
-
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        try{
         this.googleMap = googleMap;
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title("Your location");
@@ -236,7 +209,10 @@ public class FindGymNearMe extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(markerOptions);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng,10);
         googleMap.moveCamera(cameraUpdate);
-        getNearLocations();
+        getNearLocations();}
+        catch (Exception e){
+            Toast.makeText(getContext(),"There was a location error", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void getNearLocations() {

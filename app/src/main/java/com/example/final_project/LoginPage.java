@@ -93,10 +93,12 @@ public class LoginPage extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if( loginPageEmailText.getText().toString().isEmpty() || passwordText.getText().toString().isEmpty()){
+                    Toast.makeText(getContext(),"One or more of the fields were not entered",Toast.LENGTH_LONG).show();
+                }
+                else{
                 String email = loginPageEmailText.getText().toString();
                 String password = passwordText.getText().toString();
-                //MainActivity mainActivity = new MainActivity();
-                //mainActivity.loginFunc(view,email,password);
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                             @Override
@@ -111,7 +113,7 @@ public class LoginPage extends Fragment {
                                     Toast.makeText(view.getContext(),"Login failed, please try again",Toast.LENGTH_LONG).show();
                                 }
                             }
-                        });
+                        });}
             }
         });
 
