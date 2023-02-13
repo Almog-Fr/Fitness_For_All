@@ -2,8 +2,10 @@ package com.example.final_project;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.Navigation;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -87,8 +89,7 @@ public class MainActivity extends AppCompatActivity{
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
+
                 Trainee value = dataSnapshot.getValue(Trainee.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("firstName", value.getFirstName());
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity{
                 bundle.putString("email", value.getEmail());
                 bundle.putInt("level", value.getLevel());
                 bundle.putInt("xp", value.getExperience());
-                //Navigation.findNavController(view).navigate(R.id.action_loginPage_to_postLoginPage,bundle);
+
             }
 
             @Override
@@ -117,8 +118,6 @@ public class MainActivity extends AppCompatActivity{
         myRef.setValue(trainee);
 
     }
-
-
 
 
 }
